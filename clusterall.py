@@ -28,4 +28,8 @@ while loc < len(data2[:,1]):
         for j in range(0,len(of_interest)-1):
             data2_cper.append(spicy.signal.csd(data2[loc+i,:],data2[loc+j,:]))
     loc=loc+len(of_interest)
+
+#Smooth periodograms and crossperiodograms
+m=10
+
 Z=linkage(X,'ward')
