@@ -10,6 +10,7 @@ def install(package):
     subprocess.call([sys.executable, "-m", "pip", "install", package])
 install("numpy")
 import numpy
+install("spicy")
 
 
 #Transfer data over
@@ -100,13 +101,18 @@ def make_cluster(column):
     ax = sns.clustermap(table.iloc[:,0:30],col_cluster=False)
     plt.title(column_names[column]+" over time per person")
     plt.show()
-    
-#of_interest = [4,5,6,7,8,15,19,20,55,56,57,58,59,77,123,124,125,126,127]
+
+of_interest = [4,5,6,7,8,15,19,20,55,56,57,58,59,77,123,124,125,126,127]
 #for i in of_interest:
  #   make_heat(i)
   #  make_cluster(i)
 
+#Cluster all
+import clusterall
 
-#Proposed: cluster starting with everything together. Then separate into two groups such that we find two groups with minimum distance between them.
-#Con: O(n^2*nCx)
-#Alt.:find linear function of variables of interest and cluster as before using this
+#Analyze 3D relationships
+import thesis3d
+
+#Standardize
+import stand 
+    
