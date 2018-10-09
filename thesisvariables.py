@@ -45,35 +45,27 @@ def make_num(column):
         except:
             x.append(numpy.nan)
     return x
+
 x=make_num(2)
 y=make_num(56)
 s=make_num(20)
-plt.scatter(x[0:29],y[0:29],c=s[0:29])
-plt.xlim(0,31)
-plt.ylim(0,100)
-plt.xlabel("Day")
-plt.ylabel("Sadness")
-plt.title("Sadness over time as sleep varied")
-plt.show()
+#plt.scatter(x[0:29],y[0:29],c=s[0:29])
+#plt.xlim(0,31)
+#plt.ylim(0,100)
+#plt.xlabel("Day")
+#plt.ylabel("Sadness")
+#plt.title("Sadness over time as sleep varied")
+#plt.show()
 
 #PART 1: DESCRIPTIVE STATISTICS
 def histo(column):
-    temp=[]
-    for entry in data[:,column]:
-        try:
-            temp.append(float(entry))
-        except:
-            temp.append(numpy.nan)
-    plt.hist(temp,range=[0,100])
+    plt.hist(make_num(column),range=[0,100])
     plt.xlabel(column_names[column])
     plt.ylabel("Frequency")
     plt.title("Histogram of "+column_names[column])
     plt.show()
-histo(55)
-histo(56)
-histo(57)
-histo(58)
-histo(59)
+#for i in range(55,59):
+ #   histo(i)
 
 #heat map
 import plotly.plotly as py
@@ -108,11 +100,11 @@ of_interest = [4,5,6,7,8,15,19,20,55,56,57,58,59,77,123,124,125,126,127]
   #  make_cluster(i)
 
 #Cluster all
-import clusterall
+#import clusterall
 
 #Analyze 3D relationships
-import thesis3d
+#import thesis3d
 
 #Standardize
-import stand 
+#import stand 
     
