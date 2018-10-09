@@ -91,7 +91,7 @@ data2_per_sm_usable=numpy.transpose(data2_per_sm)
 for col in range(0,p3):
     temp_col=data2_per_sm_usable[col]
     person1=0
-    while person1 < t3:
+    while person1 < t3-comparisons:
         reorganize1=[]
         r1=0
         while r1 < comparisons:
@@ -111,6 +111,15 @@ for col in range(0,p3):
             Qxyw.append(Q_new)
             person2=person2+comparisons
         person1=person1+comparisons
+Qxy=[]
+num_pairs=sum(x for x in range(1,238))
+pairs=0
+while pairs < num_pairs:
+    s=0
+    for w in range(0,14):
+        s=s+Qxyw[pairs+w*num_pairs]
+    Qxy.append(s/15)
+    pairs=pairs+1
 #Z=linkage(Qxyw,'single',optimal_ordering=True)
 #plt.title('Hierarchical Clustering Dendrogram of Multivariate Time Series')
 #dendrogram(Z,labels=individuals)
