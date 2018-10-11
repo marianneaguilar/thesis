@@ -17,9 +17,9 @@ for i in individuals:
         data_temp=data[i==data[:,9],col]
         data_temp2=[]
         for entry in range(0,len(data_temp)-1):
-            try:
-                data_temp2.append(float(data_temp[entry]))
-            except:
+            if data_temp[entry] == "":
+                a=0
+                c=0
                 if entry-14 >= 0:
                     try:
                         a=a+data_temp[entry-14]
@@ -49,9 +49,47 @@ for i in individuals:
                         a=a+0
                         c=c+0
                 if c==0:
-                    data_temp2.append(numpy.mean(data_temp))
+                    data_temp2.append(-1)
                 else:
                     data_temp2.append(a/c)
+            else:
+                try:
+                    data_temp2.append(float(data_temp[entry]))
+                except:
+                    a=0
+                    c=0
+                    if entry-14 >= 0:
+                        try:
+                            a=a+data_temp[entry-14]
+                            c=c+1
+                        except:
+                            a=a+0
+                            c=c+0
+                    if entry-7 >= 0:
+                        try:
+                            a=a+data_temp[entry-7]
+                            c=c+1
+                        except:
+                            a=a+0
+                            c=c+0
+                    if entry+7 < len(data_temp):
+                        try:
+                            a=a+data_temp[entry+7]
+                            c=c+1
+                        except:
+                            a=a+0
+                            c=c+0
+                    if entry+14 < len(data_temp):
+                        try:
+                            a=a+data_temp[entry+14]
+                            c=c+1
+                        except:
+                            a=a+0
+                            c=c+0
+                    if c==0:
+                        data_temp2.append(-1)
+                    else:
+                        data_temp2.append(a/c)
         data2.append(data_temp2[0:29])
 #Calculate periodogram-cross periodogram matrices
 data2_per = []
