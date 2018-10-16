@@ -106,7 +106,7 @@ t2=len(data2_per)
 p2=len(data2_per[1])
 
 #Smooth periodograms and crossperiodograms
-m=5
+m=1
 data2_per_sm=[]
 for student in data2_per:
     temp_sm=[]
@@ -122,10 +122,15 @@ for student in data2_per:
 t3=len(data2_per_sm)
 p3=len(data2_per_sm[1])
 
+data2_per_sm2=numpy.nan_to_num(data2_per_sm,copy=True)
+
+t4=len(data2_per_sm2)
+p4=len(data2_per_sm2[1])
+
 #Compute likelihood test for each frequency        
 Qxyw=[]
 comparisons=int(t3/len(individuals))
-data2_per_sm_usable=numpy.transpose(data2_per_sm)
+data2_per_sm_usable=numpy.transpose(data2_per_sm2)
 for col in range(0,p3):
     temp_col=data2_per_sm_usable[col]
     person1=0
@@ -142,10 +147,54 @@ for col in range(0,p3):
             while r2 < comparisons:
                 reorganize2.append(temp_col[person2+r2:person2+r2+len(of_interest)])
                 r2=r2+len(of_interest)
-            Q_new1=abs(numpy.linalg.det(reorganize1))**(2*m+1)
-            Q_new2=abs(numpy.linalg.det(reorganize2))**(2*m+1)
-            Q_new12=abs(numpy.linalg.det(numpy.matrix(reorganize1)+numpy.matrix(reorganize2)))**(2*m+1)
-            Q_new=(2**(2*(2*m+1)))*(Q_new1*Q_new2)/(Q_new12**2)
+            count=0
+            divisor=0
+            try:
+                e1=scipy.linalg.eigvals(numpy.array(reorganize1))
+            except:
+                e1=[1,1]
+            Q_new1=1
+            for i in e1:
+                Q_new1=Q_new1*i/(10**(-18))
+            if math.isnan(Q_new1):
+                Q_new1 = 0
+            if Q_new1 != 0:
+                divisor=math.trunc(math.log10(abs(Q_new1)))+divisor
+                count=count+1
+            try:
+                e2=scipy.linalg.eigvals(numpy.array(reorganize2))
+            except:
+                e2=[1,1]
+            Q_new2=1
+            for i in e2:
+                Q_new2=Q_new2*i/(10**(-18))
+            if math.isnan(Q_new2):
+                Q_new2 = 0
+            if Q_new2 != 0:
+                divisor=math.trunc(math.log10(abs(Q_new2)))+divisor
+                count=count+1
+            try:
+                e3=scipy.linalg.eigvals(numpy.matrix(reorganize1)+numpy.matrix(reorganize2))
+            except:
+                e3=[1,1]
+            Q_new12=1
+            for i in e3:
+                Q_new12=Q_new12*i/(10**(-18))
+            if Q_new12 != 0:
+                divisor=math.trunc(math.log10(abs(Q_new12)))+divisor
+                count=count+1
+            avgdiv=0
+            if count != 0:
+                avgdiv=divisor/count
+            Q_new1=Q_new1/(10**avgdiv)
+            Q_new2=Q_new2/(10**avgdiv)
+            Q_new12=Q_new12/(10**avgdiv)
+            if Q_new12 == 0 or math.isnan(Q_new12):
+                Q_new=(2**(2*(2*m+1)))*(Q_new1**(2*m+1)*Q_new2**(2*m+1))
+            else:
+                Q_new=(2**(2*(2*m+1)))*((Q_new1**(2*m+1))*(Q_new2**(2*m+1)))/(Q_new12**(2*(2*m+1)))
+            if math.isnan(Q_new):
+                op=op+1
             Qxyw.append(Q_new)
             person2=person2+comparisons
         person1=person1+comparisons
@@ -158,7 +207,7 @@ while pairs < num_pairs:
         s=s+Qxyw[pairs+w*num_pairs]
     Qxy.append(s/15)
     pairs=pairs+1
-#Z=linkage(Qxyw,'single',optimal_ordering=True)
-#plt.title('Hierarchical Clustering Dendrogram of Multivariate Time Series')
-#dendrogram(Z,labels=individuals)
+Z=linkage(Qxy,'single',optimal_ordering=True)
+plt.title('Hierarchical Clustering Dendrogram of Multivariate Time Series')
+dendrogram(Z,labels=individuals)
 #dendrogram(Z,truncate_mode='lastp',p=6,show_contracted=True)
