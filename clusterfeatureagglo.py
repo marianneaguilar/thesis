@@ -99,12 +99,15 @@ for row in data1:
     for i in row:
         data_temp3.append((i-avg)/s)
     data2.append(data_temp3)
+data2_per=[]
+for row in data2:
+    data2_per.append(scipy.signal.periodogram(row)[1])
 data3=[]
 person=0
 while person<4522:
     temp=[]
     for i in range(0,19):
-        temp2=numpy.array(data2[person+i])
+        temp2=numpy.array(data2_per[person+i])
         if len(temp2) != 29:
             temp3=numpy.pad(temp2,(0,29-len(temp2)),'constant',constant_values=(0,0))
             temp.append(temp3)
