@@ -209,7 +209,7 @@ person=0
 while person<4522:
     temp=[]
     for i in range(0,19):
-        temp2=numpy.array(data2[person+i])
+        temp2=numpy.array(data2_per[person+i])
         if len(temp2) != 29:
             temp3=numpy.pad(temp2,(0,29-len(temp2)),'constant',constant_values=(0,0))
             temp.append(temp3)
@@ -244,6 +244,43 @@ def make_grouped_clusters(of_int):
         if Z.labels_[person] == 3:
             group3.append(data2[19*person+of_int])
         person=person+1
+        '''
+    t = pd.DataFrame(group0)
+    ax = sns.heatmap(t,cbar=False)
+    plt.title("PerCluster 0-"+str(of_int))
+    plt.savefig('percluster0'+str(of_int)+'.png')
+    t1 = pd.DataFrame(group1)
+    ax1 = sns.heatmap(t1,cbar=False)
+    plt.title("PerCluster 1-"+str(of_int))
+    plt.savefig('percluster1'+str(of_int)+'.png')
+    t2 = pd.DataFrame(group2)
+    ax2 = sns.heatmap(t2,cbar=False)
+    plt.title("PerCluster 2-"+str(of_int))
+    plt.savefig('percluster2'+str(of_int)+'.png')
+    t3 = pd.DataFrame(group3)
+    ax3 = sns.heatmap(t3,cbar=False)
+    plt.title("PerCluster 3-"+str(of_int))
+    plt.savefig('percluster3'+str(of_int)+'.png')
+    '''
+    return group0,group1,group2,group3
+
+  '''  
+def make_grouped_clusters(of_int):
+    person=0
+    group0=[]
+    group1=[]
+    group2=[]
+    group3=[]
+    while person < 238:
+        if Z.labels_[person] == 0:
+            group0.append(data2[19*person+of_int])
+        if Z.labels_[person] == 1:
+            group1.append(data2[19*person+of_int])
+        if Z.labels_[person] == 2:
+            group2.append(data2[19*person+of_int])
+        if Z.labels_[person] == 3:
+            group3.append(data2[19*person+of_int])
+        person=person+1
     t = pd.DataFrame(group0)
     ax = sns.heatmap(t,cbar=False)
     plt.title("Non-PerCluster 0-"+str(of_int))
@@ -261,69 +298,43 @@ def make_grouped_clusters(of_int):
     plt.title("Non-perCluster 3-"+str(of_int))
     plt.savefig('nonpercluster3'+str(of_int)+'.png')
     return group0,group1,group2,group3
+    '''
 
 sigdiff=[]
-for i in range(0,19):
-    group0,group1,group2,group3=make_grouped_clusters(i)
-
-"""    
-for i in range(0,19):
-    group0,group1,group2,group3=make_grouped_clusters(i)
-    m1=0
-    m2=0
-    m3=0
-    m4=0
-    c1=0
-    c2=0
-    c3=0
-    c4=0
-    for row in numpy.array(group0):
-        m1=m1+sum(row)
-        c1=c1+len(row)
-    for row in numpy.array(group1):
-        m2=m2+sum(row)
-        c2=c2+len(row)
-    for row in numpy.array(group2):
-        m3=m3+sum(row)
-        c3=c3+len(row)
-    for row in numpy.array(group3):
-        m4=m4+sum(row)
-        c4=c4+len(row)
-    if c1 == 0:
-        avg1=0
-    else:
-        avg1=m1/c1
-    if c2 == 0:
-        avg2=0
-    else:
-        avg2=m2/c2
-    if c3 == 0:
-        avg3=0
-    else:
-        avg3=m3/c3
-    if c4 == 0:
-        avg4=0
-    else:
-        avg4=m4/c4 
-    sigdiff.append([avg1,avg2,avg3,avg4])
-
-
-
-sigdiffstd=[]
-
-sigdiff2=[]
-for row in sigdiff:
-    group0=row[0]
-    group1=row[1]
-    group2=row[2]
-    group3=row[3]
-    sigdiff2.append(scipy.stats.ttest_ind(group0,group1))
-    sigdiff2.append(scipy.stats.ttest_ind(group0,group2))
-    sigdiff2.append(scipy.stats.ttest_ind(group0,group3))
-    sigdiff2.append(scipy.stats.ttest_ind(group2,group1))
-    sigdiff2.append(scipy.stats.ttest_ind(group3,group1))
-    sigdiff2.append(scipy.stats.ttest_ind(group2,group3))
+comparison=[]
     
+for i in range(0,19):
+    group0,group1,group2,group3=make_grouped_clusters(i)
+    m1=[]
+    m2=[]
+    m3=[]
+    m4=[]
+    for row in numpy.array(group0):
+        m1.append(numpy.mean(row))
+    for row in numpy.array(group1):
+        m2.append(numpy.mean(row))
+    for row in numpy.array(group2):
+        m3.append(numpy.mean(row))
+    for row in numpy.array(group3):
+        m4.append(numpy.mean(row)) 
+    sigdiff.append(scipy.stats.ttest_ind(m1,m2,equal_var=False))
+    comparison.append("Group 1-Group 2 on"+column_names[of_interest[i]])
+    sigdiff.append(scipy.stats.ttest_ind(m1,m3,equal_var=False))
+    comparison.append("Group 1-Group 3 on"+column_names[of_interest[i]])
+    sigdiff.append(scipy.stats.ttest_ind(m1,m4,equal_var=False))
+    comparison.append("Group 1-Group 4 on"+column_names[of_interest[i]])
+    sigdiff.append(scipy.stats.ttest_ind(m3,m2,equal_var=False))
+    comparison.append("Group 2-Group 3 on"+column_names[of_interest[i]])
+    sigdiff.append(scipy.stats.ttest_ind(m4,m2,equal_var=False))
+    comparison.append("Group 2-Group 4 on"+column_names[of_interest[i]])
+    sigdiff.append(scipy.stats.ttest_ind(m3,m4,equal_var=False))
+    comparison.append("Group 3-Group 4 on"+column_names[of_interest[i]])
+
+
+for i in range(0,len(sigdiff)):
+    if sigdiff[i].pvalue<0.15:
+        print(comparison[i])
+
 #Analyze 3D relationships
 #import thesis3d
 
