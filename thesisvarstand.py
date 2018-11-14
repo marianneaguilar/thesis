@@ -222,9 +222,9 @@ def fix(of_interest):
         temp=numpy.array(temp)
         data3.append(temp.flatten())
         person=person+len(of_interest)
-    return data2,data3
+    return data1,data2,data3
 
-data2,data3=fix(of_interest)
+data1,data2,data3=fix(of_interest)
 
 install("sklearn")
 from sklearn.cluster import FeatureAgglomeration
@@ -345,7 +345,7 @@ for i in range(0,len(sigdiff)):
 #To input all numeric data
 of_interest2 = [4,5,6,7,14,15,17,18,19,20,21,22,23,24,25,55,57,58,59,60,61,62,63,64,65,66,79,111,112,113,114,115,117,118,125,126,127,128,129,130,131,132,133,134,136]
 
-data2,data3=fix(of_interest2)
+data1,data2,data3=fix(of_interest2)
 
 group0=[]
 group1=[]
@@ -364,30 +364,45 @@ temp=data[data[:,2]=='28',:]
 #Create answers to what mood[day 28] is
 for row in range(0,len(Z.labels_)):
     t=temp[temp[:,9]==individuals[row],:]
+    t0=0
+    t1=0
+    t2=0
+    try:
+        t0=float(t[0][57])
+    except:
+        t0=numpy.mean(data1[row*len(of_interest2)+15])
+    try:
+        t1=float(t[0][58])
+    except:
+        t1=numpy.mean(data1[row*len(of_interest2)+16])
+    try:
+        t2=float(t[0][60])
+    except:
+        t2=numpy.mean(data1[row*len(of_interest2)+18])
     if Z.labels_[row]==0:
         if len(t) == 1:
-            group0ans.append(t[0,[57,58,60]])
+            group0ans.append([t0,t1,t2])
             group0.append(data3[row])
             group0indivs.append(individuals[row])
     if Z.labels_[row]==1:
         if len(t) == 1:
-            group1ans.append(t[0,[57,58,60]])
+            group1ans.append([t0,t1,t2])
             group1.append(data3[row])
             group1indivs.append(individuals[row])
     if Z.labels_[row]==2:
         if len(t) == 1:
-            group2ans.append(t[0,[57,58,60]])
+            group2ans.append([t0,t1,t2])
             group2.append(data3[row])
             group2indivs.append(individuals[row])
     if Z.labels_[row]==3:
         if len(t) == 1:
-            group3ans.append(t[0,[57,58,60]])
+            group3ans.append([t0,t1,t2])
             group3.append(data3[row])
             group3indivs.append(individuals[row])
 
 #Create neural network        
 from sklearn.neural_network import MLPRegressor
-neural=MLPRegressor(activation='identity',solver='lbfgs')
+neural=MLPRegressor(hidden_layer_sizes=10,activation='identity',solver='lbfgs')
 
 lim0=int(numpy.trunc(len(group0)/2))
 lim1=int(numpy.trunc(len(group1)/2))
@@ -413,50 +428,50 @@ group3fit=group3[1+lim3:len(group3)]
 group3fitans=group3ans[1+lim3:len(group3ans)]
 
 #Train model for group 0
-X0=numpy.array(group0tester)
+X0=numpy.asarray(group0tester, dtype=float)
 X0=numpy.nan_to_num(X0,copy=True)
-X1=numpy.array(group0testerans)
+X1=numpy.asarray(group0testerans,dtype=float)
 X1=numpy.nan_to_num(X1,copy=True)
 group0model=neural.fit(X0,X1)
 
 #Train model for group 1
-X2=numpy.array(group1tester)
+X2=numpy.asarray(group1tester, dtype=float)
 X2=numpy.nan_to_num(X2,copy=True)
-X3=numpy.array(group1testerans)
+X3=numpy.asarray(group1testerans, dtype=float)
 X3=numpy.nan_to_num(X3,copy=True)
 group1model=neural.fit(X2,X3)
 
 #Train model for group 2
-X4=numpy.array(group2tester)
+X4=numpy.asarray(group2tester, dtype=float)
 X4=numpy.nan_to_num(X4,copy=True)
-X5=numpy.array(group2testerans)
+X5=numpy.asarray(group2testerans,dtype=float)
 X5=numpy.nan_to_num(X5,copy=True)
 group2model=neural.fit(X4,X5)
 
 #Train model for group 3
-X6=numpy.array(group3tester)
+X6=numpy.asarray(group3tester,dtype=float)
 X6=numpy.nan_to_num(X6,copy=True)
-X7=numpy.array(group3testerans)
+X7=numpy.asarray(group3testerans,dtype=float)
 X7=numpy.nan_to_num(X7,copy=True)
 group3model=neural.fit(X6,X7)
 
 #Test model for group 0
-X8=numpy.array(group0fit)
+X8=numpy.asarray(group0fit,dtype=float)
 X8=numpy.nan_to_num(X8,copy=True)
 group0preds=group0model.predict(X8)
 
 #Test model for group 1
-X9=numpy.array(group1fit)
+X9=numpy.asarray(group1fit,dtype=float)
 X9=numpy.nan_to_num(X9,copy=True)
 group1preds=group1model.predict(X9)
 
 #Test model for group 2
-X10=numpy.array(group2fit)
+X10=numpy.asarray(group2fit,dtype=float)
 X10=numpy.nan_to_num(X10,copy=True)
 group2preds=group2model.predict(X10)
 
 #Test model for group 3
-X11=numpy.array(group3fit)
+X11=numpy.asarray(group3fit,dtype=float)
 X11=numpy.nan_to_num(X11,copy=True)
 group3preds=group3model.predict(X11)
 
@@ -466,3 +481,4 @@ group3preds=group3model.predict(X11)
 
 #Standardize
 #import stand
+
