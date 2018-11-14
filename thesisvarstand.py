@@ -1,4 +1,4 @@
-#Import packages needed for installation of other packages
+
 import os
 os.chdir("/Users/marianneaguilar/Documents")
 os.getcwd()
@@ -13,7 +13,7 @@ import numpy
 install("spicy")
 
 
-#Transfer data from Excel over to numpy array
+#Transfer data over
 data = []
 with open("MIT-college-sleep-diary-20180919-mta.csv") as csvfile:
     reader = csv.reader(csvfile)
@@ -22,7 +22,7 @@ with open("MIT-college-sleep-diary-20180919-mta.csv") as csvfile:
 column_names = data[0]
 data = numpy.delete(data, (0), axis=0)
 
-#Check of successful transfer
+#Visualization
 """
 print(data[0])
 print(data[0][9])
@@ -39,7 +39,6 @@ import pandas as pd
 #Visualize day-to-day plot before standardization
 individuals = numpy.unique(data[:,9])
 plt.axes()
-#Function to make a column numeric and return the numeric values
 def make_num(column):
     x=[]
     for entry in data[:,[column]]:
@@ -52,31 +51,25 @@ def make_num(column):
 x=make_num(2)
 y=make_num(56)
 s=make_num(20)
-"""
-plt.scatter(x[0:29],y[0:29],c=s[0:29])
-plt.xlim(0,31)
-plt.ylim(0,100)
-plt.xlabel("Day")
-plt.ylabel("Sadness")
-plt.title("Sadness over time as sleep varied")
-plt.show()
-"""
+#plt.scatter(x[0:29],y[0:29],c=s[0:29])
+#plt.xlim(0,31)
+#plt.ylim(0,100)
+#plt.xlabel("Day")
+#plt.ylabel("Sadness")
+#plt.title("Sadness over time as sleep varied")
+#plt.show()
 
 #PART 1: DESCRIPTIVE STATISTICS
-#Function to make histogram
 def histo(column):
     plt.hist(make_num(column),range=[0,100])
     plt.xlabel(column_names[column])
     plt.ylabel("Frequency")
     plt.title("Histogram of "+column_names[column])
     plt.show()
+#for i in range(55,59):
+ #   histo(i)
 
-"""
-for i in range(55,59):
-    histo(i)
-"""
-
-#Function to make heat map and clustered heat map
+#heat map
 import plotly.plotly as py
 import plotly.graph_objs as go
 install("seaborn")
@@ -103,18 +96,13 @@ def make_cluster(column):
     plt.title(column_names[column]+" over time per person")
     plt.show()
 
-#PART 2:CLUSTERING ALL THE DATA
-
-#Define columns of interest
 #Removed 17,55,57,58,59,60,61,62,63,64,65,66,125,126,127,128,129,130,131,132,133,134
 of_interest = [4,5,6,7,14,15,18,19,20,21,22,23,24,25,79,111,112,113,114,115,117,118,136]
-"""
-for i in of_interest:
-    make_heat(i)
-    make_cluster(i)
-"""
+#for i in of_interest:
+ #   make_heat(i)
+  #  make_cluster(i)
 
-#Import and install packages for clustering
+#Cluster all
 import scipy
 install("statistics")
 import statistics
@@ -122,22 +110,21 @@ from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from scipy.signal import periodogram,csd
 install("math")
 import math
-
 #N=number time series objects
 #T=length of time serie objects (using 30 days here)
 N=len(individuals)
 T=30
 P=N
-#Function to reorganize data into time series format without using pivot function
+#Reorganize data into time series format without using pivot function
 def fix(of_interest):
     data1=[]
     data2=[]
-    for i in individuals: #Per individual
-        for col in of_interest: #Per column of interest
-            data_temp=data[i==data[:,9],col] #Isolate column of interest
+    for i in individuals:
+        for col in of_interest:
+            data_temp=data[i==data[:,9],col]
             data_temp2=[]
             for entry in range(0,len(data_temp)-1):
-                if data_temp[entry] == "": #Check if empty
+                if data_temp[entry] == "":
                     a=0
                     c=0
                     if entry-14 >= 0:
@@ -210,9 +197,8 @@ def fix(of_interest):
                             data_temp2.append(-1)
                         else:
                             data_temp2.append(a/c)
-            data1.append(data_temp2[0:27])
-    #Standardize
-    for row in data1: 
+            data1.append(data_temp2[0:29])
+    for row in data1:
         avg=numpy.mean(row)
         s=numpy.std(row)
         data_temp3=[]
@@ -220,18 +206,16 @@ def fix(of_interest):
             data_temp3.append((i-avg)/s)
         data2.append(data_temp3)
     data2_per=[]
-    #Find periodogram
-    for row in data2: 
+    for row in data2:
         data2_per.append(scipy.signal.periodogram(row)[1])
     data3=[]
     person=0
-    #Flatten so that one person per row of data3
     while person<238*len(of_interest):
         temp=[]
         for i in range(0,len(of_interest)):
             temp2=numpy.array(data2_per[person+i])
-            if len(temp2) != 27:
-                temp3=numpy.pad(temp2,(0,27-len(temp2)),'constant',constant_values=(0,0))
+            if len(temp2) != 29:
+                temp3=numpy.pad(temp2,(0,29-len(temp2)),'constant',constant_values=(0,0))
                 temp.append(temp3)
             else:
                 temp.append(temp2)
@@ -242,7 +226,6 @@ def fix(of_interest):
 
 data2,data3=fix(of_interest)
 
-#Use sklearn to cluster on features of individuals
 install("sklearn")
 from sklearn.cluster import FeatureAgglomeration
 agglo=FeatureAgglomeration(n_clusters=4,affinity="euclidean")
@@ -251,7 +234,7 @@ X=numpy.nan_to_num(X,copy=True)
 Z=agglo.fit(numpy.transpose(X))
 Z.labels_
 
-#Function to visualize different heat maps
+
 def make_grouped_clusters(of_int):
     person=0
     group0=[]
@@ -326,8 +309,7 @@ def make_grouped_clusters(of_int):
 
 sigdiff=[]
 comparison=[]
-
-#Function to test if means of individuals' time series across columns differ significantly
+    
 for i in range(0,len(of_interest)):
     group0,group1,group2,group3=make_grouped_clusters(i)
     m1=[]
@@ -355,7 +337,7 @@ for i in range(0,len(of_interest)):
     sigdiff.append(scipy.stats.ttest_ind(m3,m4,equal_var=False))
     comparison.append("Group 3-Group 4 on "+column_names[of_interest[i]])
 
-#Visualize which column of interest in data differ significantly in clustering
+
 for i in range(0,len(sigdiff)):
     if sigdiff[i].pvalue<0.1:
         print(comparison[i])
@@ -478,11 +460,9 @@ X11=numpy.array(group3fit)
 X11=numpy.nan_to_num(X11,copy=True)
 group3preds=group3model.predict(X11)
 
+
 #Analyze 3D relationships
 #import thesis3d
 
 #Standardize
 #import stand
-
-
-    
