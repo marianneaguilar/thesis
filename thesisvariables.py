@@ -493,6 +493,108 @@ X11=numpy.asarray(group3fit,dtype=float)
 X11=numpy.nan_to_num(X11,copy=True)
 group3preds=group3model.predict(X11)
 
+#Create residual plots
+#Residual plots group 0
+resids57_0=[]
+for i in range(0,len(group0preds)):
+    resids57_0.append(group0preds[i][0]-group0fitans[i][0])
+plt.hist(resids57_0)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 1-Model 0")
+plt.show()
+resids58_0=[]
+for i in range(0,len(group0preds)):
+    resids58_0.append(group0preds[i][1]-group0fitans[i][1])
+plt.hist(resids58_0)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 2-Model 0")
+plt.show()
+resids60_0=[]
+for i in range(0,len(group0preds)):
+    resids60_0.append(group0preds[i][2]-group0fitans[i][2])
+plt.hist(resids60_0)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 4-Model 0")
+plt.show()
+#Residual plots group 1
+resids57_1=[]
+for i in range(0,len(group1preds)):
+    resids57_1.append(group1preds[i][0]-group1fitans[i][0])
+plt.hist(resids57_1)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 1-Model 1")
+plt.show()
+resids58_1=[]
+for i in range(0,len(group1preds)):
+    resids58_1.append(group1preds[i][1]-group1fitans[i][1])
+plt.hist(resids58_1)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 2-Model 1")
+plt.show()
+resids60_1=[]
+for i in range(0,len(group1preds)):
+    resids60_1.append(group1preds[i][2]-group1fitans[i][2])
+plt.hist(resids60_1)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 4-Model 1")
+plt.show()
+#Residual plots group 2
+resids57_2=[]
+for i in range(0,len(group2preds)):
+    resids57_2.append(group2preds[i][0]-group2fitans[i][0])
+plt.hist(resids57_1)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 1-Model 2")
+plt.show()
+resids58_2=[]
+for i in range(0,len(group2preds)):
+    resids58_2.append(group2preds[i][1]-group2fitans[i][1])
+plt.hist(resids58_2)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 2-Model 2")
+plt.show()
+resids60_2=[]
+for i in range(0,len(group2preds)):
+    resids60_2.append(group2preds[i][2]-group2fitans[i][2])
+plt.hist(resids60_2)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 4-Model 2")
+plt.show()
+#Residual plots group 3
+resids57_3=[]
+for i in range(0,len(group3preds)):
+    resids57_3.append(group3preds[i][0]-group3fitans[i][0])
+plt.hist(resids57_3)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 1-Model 3")
+plt.show()
+resids58_3=[]
+for i in range(0,len(group3preds)):
+    resids58_3.append(group3preds[i][1]-group3fitans[i][1])
+plt.hist(resids58_3)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 2-Model 3")
+plt.show()
+resids60_3=[]
+for i in range(0,len(group3preds)):
+    resids60_3.append(group3preds[i][2]-group3fitans[i][2])
+plt.hist(resids60_3)
+plt.xlabel("Residuals")
+plt.ylabel("Frequency")
+plt.title("Histogram of Residuals for Scale 4-Model 3")
+plt.show()
+
 #Analyze 3D relationships
 #import thesis3d
 
