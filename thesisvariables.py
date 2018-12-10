@@ -229,15 +229,18 @@ def fix(of_interest):
     while person<238*len(of_interest):
         temp=[]
         for i in range(0,len(of_interest)):
-            temp2=numpy.array(data2_per[person+i])
-            if len(temp2) != 27:
-                temp3=numpy.pad(temp2,(0,27-len(temp2)),'constant',constant_values=(0,0))
+            temp2per=numpy.array(data2_per[person+i])
+            temp2stan=numpy.array(data2[person+i])
+            temp2=numpy.array(numpy.append(temp2per,temp2stan[len(temp2stan)-(35-len(temp2per)):len(temp2stan)]))
+            if len(temp2) != 35:
+                temp3=numpy.pad(temp2,(0,35-len(temp2)),'constant',constant_values=(0,0))
                 temp.append(temp3)
             else:
                 temp.append(temp2)
         temp=numpy.array(temp)
         data3.append(temp.flatten())
         person=person+len(of_interest)
+    
     return data1,data2,data3
 
 data1,data2,data3=fix(of_interest)
@@ -245,7 +248,7 @@ data1,data2,data3=fix(of_interest)
 #Use sklearn to cluster on features of individuals
 install("sklearn")
 from sklearn.cluster import FeatureAgglomeration
-agglo=FeatureAgglomeration(n_clusters=4,affinity="euclidean")
+agglo=FeatureAgglomeration(n_clusters=2,affinity="euclidean")
 X=numpy.array(data3)
 X=numpy.nan_to_num(X,copy=True)
 Z=agglo.fit(numpy.transpose(X))
@@ -256,17 +259,21 @@ def make_grouped_clusters(of_int):
     person=0
     group0=[]
     group1=[]
+    """
     group2=[]
     group3=[]
+    """
     while person < 238:
         if Z.labels_[person] == 0:
             group0.append(data2[len(of_interest)*person+of_int])
         if Z.labels_[person] == 1:
             group1.append(data2[len(of_interest)*person+of_int])
+        """
         if Z.labels_[person] == 2:
             group2.append(data2[len(of_interest)*person+of_int])
         if Z.labels_[person] == 3:
             group3.append(data2[len(of_interest)*person+of_int])
+        """
         person=person+1
         """
     t = pd.DataFrame(group0)
@@ -286,8 +293,8 @@ def make_grouped_clusters(of_int):
     plt.title("PerCluster 3-"+str(of_int))
     plt.savefig('percluster3'+str(of_int)+'.png')
     """
-    return group0,group1,group2,group3
-
+    return group0,group1#,group2,group3
+ 
 """
 def make_grouped_clusters(of_int):
     person=0
@@ -329,21 +336,26 @@ comparison=[]
 
 #Function to test if means of individuals' time series across columns differ significantly
 for i in range(0,len(of_interest)):
-    group0,group1,group2,group3=make_grouped_clusters(i)
+    group0,group1=make_grouped_clusters(i)
     m1=[]
     m2=[]
+    """
     m3=[]
     m4=[]
+    """
     for row in numpy.array(group0):
         m1.append(numpy.mean(row))
     for row in numpy.array(group1):
         m2.append(numpy.mean(row))
+    """
     for row in numpy.array(group2):
         m3.append(numpy.mean(row))
     for row in numpy.array(group3):
-        m4.append(numpy.mean(row)) 
+        m4.append(numpy.mean(row))
+    """
     sigdiff.append(scipy.stats.ttest_ind(m1,m2,equal_var=False))
     comparison.append("Group 1-Group 2 on "+column_names[of_interest[i]])
+    """
     sigdiff.append(scipy.stats.ttest_ind(m1,m3,equal_var=False))
     comparison.append("Group 1-Group 3 on "+column_names[of_interest[i]])
     sigdiff.append(scipy.stats.ttest_ind(m1,m4,equal_var=False))
@@ -354,6 +366,7 @@ for i in range(0,len(of_interest)):
     comparison.append("Group 2-Group 4 on "+column_names[of_interest[i]])
     sigdiff.append(scipy.stats.ttest_ind(m3,m4,equal_var=False))
     comparison.append("Group 3-Group 4 on "+column_names[of_interest[i]])
+    """
 
 #Visualize which column of interest in data differ significantly in clustering
 for i in range(0,len(sigdiff)):
@@ -367,16 +380,20 @@ data1,data2,data3=fix(of_interest2)
 
 group0=[]
 group1=[]
+"""
 group2=[]
 group3=[]
+"""
 group0ans=[]
 group0indivs=[]
 group1ans=[]
 group1indivs=[]
+"""
 group2ans=[]
 group2indivs=[]
 group3ans=[]
 group3indivs=[]
+"""
 temp=data[data[:,2]=='28',:]
 
 #Create answers to what mood[day 28] is
@@ -407,6 +424,7 @@ for row in range(0,len(Z.labels_)):
             group1ans.append([t0,t1,t2])
             group1.append(data3[row])
             group1indivs.append(individuals[row])
+    """
     if Z.labels_[row]==2:
         if len(t) == 1:
             group2ans.append([t0,t1,t2])
@@ -417,6 +435,7 @@ for row in range(0,len(Z.labels_)):
             group3ans.append([t0,t1,t2])
             group3.append(data3[row])
             group3indivs.append(individuals[row])
+    """
 
 #Create neural network        
 from sklearn.neural_network import MLPRegressor
@@ -424,8 +443,10 @@ neural=MLPRegressor(hidden_layer_sizes=10,activation='identity',solver='lbfgs')
 
 lim0=int(numpy.trunc(len(group0)/2))
 lim1=int(numpy.trunc(len(group1)/2))
+"""
 lim2=int(numpy.trunc(len(group2)/2))
 lim3=int(numpy.trunc(len(group3)/2))
+"""
 
 #Separate into training and testing
 group0tester=group0[0:lim0]
@@ -436,6 +457,7 @@ group1tester=group1[0:lim1]
 group1testerans=group1ans[0:lim1]
 group1fit=group1[1+lim1:len(group1)]
 group1fitans=group1ans[1+lim1:len(group1ans)]
+"""
 group2tester=group2[0:lim2]
 group2testerans=group2ans[0:lim2]
 group2fit=group2[1+lim2:len(group2)]
@@ -444,6 +466,7 @@ group3tester=group3[0:lim3]
 group3testerans=group3ans[0:lim3]
 group3fit=group3[1+lim3:len(group3)]
 group3fitans=group3ans[1+lim3:len(group3ans)]
+"""
 
 #Train model for group 0
 X0=numpy.asarray(group0tester, dtype=float)
@@ -459,6 +482,7 @@ X3=numpy.asarray(group1testerans, dtype=float)
 X3=numpy.nan_to_num(X3,copy=True)
 group1model=neural.fit(X2,X3)
 
+"""
 #Train model for group 2
 X4=numpy.asarray(group2tester, dtype=float)
 X4=numpy.nan_to_num(X4,copy=True)
@@ -473,6 +497,8 @@ X7=numpy.asarray(group3testerans,dtype=float)
 X7=numpy.nan_to_num(X7,copy=True)
 group3model=neural.fit(X6,X7)
 
+"""
+
 #Test model for group 0
 X8=numpy.asarray(group0fit,dtype=float)
 X8=numpy.nan_to_num(X8,copy=True)
@@ -482,6 +508,8 @@ group0preds=group0model.predict(X8)
 X9=numpy.asarray(group1fit,dtype=float)
 X9=numpy.nan_to_num(X9,copy=True)
 group1preds=group1model.predict(X9)
+
+"""
 
 #Test model for group 2
 X10=numpy.asarray(group2fit,dtype=float)
@@ -493,11 +521,16 @@ X11=numpy.asarray(group3fit,dtype=float)
 X11=numpy.nan_to_num(X11,copy=True)
 group3preds=group3model.predict(X11)
 
-#Create residual plots
+"""
+
+#Create residual plots and calculate MSE estimate
+mse0=0
+mse1=0
 #Residual plots group 0
 resids57_0=[]
 for i in range(0,len(group0preds)):
     resids57_0.append(group0preds[i][0]-group0fitans[i][0])
+    mse0=mse0+(group0preds[i][0]-group0fitans[i][0])**2
 plt.hist(resids57_0)
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
@@ -506,6 +539,7 @@ plt.show()
 resids58_0=[]
 for i in range(0,len(group0preds)):
     resids58_0.append(group0preds[i][1]-group0fitans[i][1])
+    mse0=mse0+(group0preds[i][1]-group0fitans[i][1])**2
 plt.hist(resids58_0)
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
@@ -514,6 +548,7 @@ plt.show()
 resids60_0=[]
 for i in range(0,len(group0preds)):
     resids60_0.append(group0preds[i][2]-group0fitans[i][2])
+    mse0=mse0+(group0preds[i][2]-group0fitans[i][2])**2
 plt.hist(resids60_0)
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
@@ -523,6 +558,7 @@ plt.show()
 resids57_1=[]
 for i in range(0,len(group1preds)):
     resids57_1.append(group1preds[i][0]-group1fitans[i][0])
+    mse1=mse1+(group1preds[i][0]-group1fitans[i][0])**2
 plt.hist(resids57_1)
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
@@ -531,6 +567,7 @@ plt.show()
 resids58_1=[]
 for i in range(0,len(group1preds)):
     resids58_1.append(group1preds[i][1]-group1fitans[i][1])
+    mse1=mse1+(group1preds[i][1]-group1fitans[i][1])**2
 plt.hist(resids58_1)
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
@@ -539,11 +576,15 @@ plt.show()
 resids60_1=[]
 for i in range(0,len(group1preds)):
     resids60_1.append(group1preds[i][2]-group1fitans[i][2])
+    mse1=mse1+(group1preds[i][2]-group1fitans[i][2])**2
 plt.hist(resids60_1)
 plt.xlabel("Residuals")
 plt.ylabel("Frequency")
 plt.title("Histogram of Residuals for Scale 4-Model 1")
 plt.show()
+
+
+"""
 #Residual plots group 2
 resids57_2=[]
 for i in range(0,len(group2preds)):
@@ -594,6 +635,7 @@ plt.xlabel("Residuals")
 plt.ylabel("Frequency")
 plt.title("Histogram of Residuals for Scale 4-Model 3")
 plt.show()
+"""
 
 #Analyze 3D relationships
 #import thesis3d
