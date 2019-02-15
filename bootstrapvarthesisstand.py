@@ -200,8 +200,9 @@ while boot<99:
     data2=[]
     data3=[]
     for r in rand_students:
-        data1.append(prelimdata1[r])
-        data2.append(prelimdata2[r])
+        for w in range(0,45):
+            data1.append(prelimdata1[45*r+w])
+            data2.append(prelimdata2[45*r+w])
         data3.append(prelimdata3[r])
     group0=[]
     group1=[]
