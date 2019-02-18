@@ -184,10 +184,7 @@ of_interest2 = [4,5,6,7,14,15,17,18,19,20,21,22,23,24,25,55,57,58,59,60,61,62,63
 
 while boot<99:
     rand_students=random.sample(range(238),150)
-    prelimdata1c,prelimdata2c,prelimdata3c=fix(of_interest)
-    data3c=[]
-    for r in rand_students:
-        data3c.append(prelimdata3c[r])
+    data1c,data2c,data3c=fix(of_interest)
     acti='identity'
     nclus=4
     agglo=FeatureAgglomeration(n_clusters=nclus,affinity="euclidean")
@@ -199,11 +196,13 @@ while boot<99:
     data1=[]
     data2=[]
     data3=[]
+    zlabels=[]
     for r in rand_students:
         for w in range(0,45):
             data1.append(prelimdata1[45*r+w])
             data2.append(prelimdata2[45*r+w])
         data3.append(prelimdata3[r])
+        zlabels.append(Z.labels_[r])
     group0=[]
     group1=[]
     group2=[]
@@ -217,7 +216,7 @@ while boot<99:
     group3ans=[]
     group3indivs=[]
     temp=data[data[:,2]=='28',:]
-    for row in range(0,len(Z.labels_)):
+    for row in range(0,len(zlabels)):
         t=temp[temp[:,9]==individuals[row],:]
         t0=0
         t1=0
@@ -237,22 +236,22 @@ while boot<99:
             t2=float(t[0][60])
         except:
             t2=m2
-        if Z.labels_[row]==0:
+        if zlabels[row]==0:
             if len(t) == 1:
                 group0ans.append([t0,t1,t2])
                 group0.append(data3[row])
                 group0indivs.append(individuals[row])
-        if Z.labels_[row]==1:
+        if zlabels[row]==1:
             if len(t) == 1:
                 group1ans.append([t0,t1,t2])
                 group1.append(data3[row])
                 group1indivs.append(individuals[row])
-        if Z.labels_[row]==2:
+        if zlabels[row]==2:
             if len(t) == 1:
                 group2ans.append([t0,t1,t2])
                 group2.append(data3[row])
                 group2indivs.append(individuals[row])
-        if Z.labels_[row]==3:
+        if zlabels[row]==3:
             if len(t) == 1:
                 group3ans.append([t0,t1,t2])
                 group3.append(data3[row])
