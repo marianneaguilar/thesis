@@ -1,4 +1,4 @@
-
+#Import necessary packages
 import os
 os.chdir("/Users/marianneaguilar/Documents")
 os.getcwd()
@@ -22,12 +22,13 @@ with open("MIT-college-sleep-diary-20180919-mta.csv") as csvfile:
 column_names = data[0]
 data = numpy.delete(data, (0), axis=0)
 
-#Visualization
+#Visualization of data
 """
 print(data[0])
 print(data[0][9])
 """
 
+#Install necessary packages
 install("matplotlib")
 import matplotlib
 install("scipy")
@@ -51,25 +52,33 @@ def make_num(column):
 x=make_num(2)
 y=make_num(56)
 s=make_num(20)
-#plt.scatter(x[0:29],y[0:29],c=s[0:29])
-#plt.xlim(0,31)
-#plt.ylim(0,100)
-#plt.xlabel("Day")
-#plt.ylabel("Sadness")
-#plt.title("Sadness over time as sleep varied")
-#plt.show()
+#Scatterplot
+"""
+plt.scatter(x[0:29],y[0:29],c=s[0:29])
+plt.xlim(0,31)
+plt.ylim(0,100)
+plt.xlabel("Day")
+plt.ylabel("Sadness")
+plt.title("Sadness over time as sleep varied")
+plt.show()
+"""
 
 #PART 1: DESCRIPTIVE STATISTICS
+#Function to make histogram
 def histo(column):
     plt.hist(make_num(column),range=[0,100])
     plt.xlabel(column_names[column])
     plt.ylabel("Frequency")
     plt.title("Histogram of "+column_names[column])
     plt.show()
-#for i in range(55,59):
- #   histo(i)
 
-#heat map
+#Histogram of moods
+"""
+for i in range(55,59):
+    histo(i)
+"""
+
+#Packages and functions to make heat map
 import plotly.plotly as py
 import plotly.graph_objs as go
 install("seaborn")
@@ -85,6 +94,7 @@ def make_heat(column):
     plt.title(column_names[column]+" over time per person")
     plt.show()
 
+#Function to make clustered heat map
 def make_cluster(column):
     st=make_num(column)
     t = pd.DataFrame({"A": data[:,9],
@@ -96,13 +106,17 @@ def make_cluster(column):
     plt.title(column_names[column]+" over time per person")
     plt.show()
 
+#Define variables of interests
 #Removed 17,55,57,58,59,60,61,62,63,64,65,66,125,126,127,128,129,130,131,132,133,134
 of_interest = [4,5,6,7,14,15,18,19,20,21,22,23,24,25,79,111,112,113,114,115,117,118,136]
 #for i in of_interest:
  #   make_heat(i)
   #  make_cluster(i)
 
-#Cluster all
+#Define variables of interest to input all numeric data
+of_interest2 = [4,5,6,7,14,15,17,18,19,20,21,22,23,24,25,55,57,58,59,60,61,62,63,64,65,66,79,111,112,113,114,115,117,118,125,126,127,128,129,130,131,132,133,134,136]
+
+#Packages to cluster data
 import scipy
 install("statistics")
 import statistics
@@ -110,15 +124,12 @@ from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from scipy.signal import periodogram,csd
 install("math")
 import math
-#N=number time series objects
-#T=length of time serie objects (using 30 days here)
-N=len(individuals)
-T=30
-P=N
+
 #Reorganize data into time series format without using pivot function
 def fix(of_interest):
     data1=[]
     data2=[]
+    #Change each data point into float and address empty points and place into data1
     for i in individuals:
         for col in of_interest:
             data_temp=data[i==data[:,9],col]
@@ -198,6 +209,7 @@ def fix(of_interest):
                         else:
                             data_temp2.append(a/c)
             data1.append(data_temp2[0:27])
+    #Standardize data and place into data2
     for row in data1:
         avg=numpy.mean(row)
         s=numpy.std(row)
@@ -207,6 +219,7 @@ def fix(of_interest):
         data2.append(data_temp3)
     data3=[]
     person=0
+    #Make each person have 27 days or filler points at the end and place into data3
     while person<238*len(of_interest):
         temp=[]
         for i in range(0,len(of_interest)):
@@ -327,30 +340,27 @@ for i in range(0,len(of_interest)):
         m4.append(numpy.mean(row))
     if len(m1)>0 and len(m2)>0:
         sigdiff.append(scipy.stats.ttest_ind(m1,m2,equal_var=False))
-        comparison.append("Group 1-Group 2 on "+column_names[of_interest[i]])
+        comparison.append("Group 1-Group 2 on "+column_names[of_interest[i]]+" Mean 1="+str(numpy.mean(m1))+" Mean 2="+str(numpy.mean(m2)))
     if len(m1)>0 and len(m3)>0:
         sigdiff.append(scipy.stats.ttest_ind(m1,m3,equal_var=False))
-        comparison.append("Group 1-Group 3 on "+column_names[of_interest[i]])
+        comparison.append("Group 1-Group 3 on "+column_names[of_interest[i]]+" Mean 1="+str(numpy.mean(m1))+" Mean 3="+str(numpy.mean(m3)))
     if len(m1)>0 and len(m4)>0:
         sigdiff.append(scipy.stats.ttest_ind(m1,m4,equal_var=False))
-        comparison.append("Group 1-Group 4 on "+column_names[of_interest[i]])
+        comparison.append("Group 1-Group 4 on "+column_names[of_interest[i]]+" Mean 1="+str(numpy.mean(m1))+" Mean 4="+str(numpy.mean(m4)))
     if len(m2)>0 and len(m3)>0:
         sigdiff.append(scipy.stats.ttest_ind(m3,m2,equal_var=False))
-        comparison.append("Group 2-Group 3 on "+column_names[of_interest[i]])
+        comparison.append("Group 2-Group 3 on "+column_names[of_interest[i]]+" Mean 2="+str(numpy.mean(m2))+" Mean 3="+str(numpy.mean(m3)))
     if len(m2)>0 and len(m4)>0:
         sigdiff.append(scipy.stats.ttest_ind(m4,m2,equal_var=False))
-        comparison.append("Group 2-Group 4 on "+column_names[of_interest[i]])
+        comparison.append("Group 2-Group 4 on "+column_names[of_interest[i]]+" Mean 2="+str(numpy.mean(m2))+" Mean 4="+str(numpy.mean(m4)))
     if len(m3)>0 and len(m4)>0:
         sigdiff.append(scipy.stats.ttest_ind(m3,m4,equal_var=False))
-        comparison.append("Group 3-Group 4 on "+column_names[of_interest[i]])
+        comparison.append("Group 3-Group 4 on "+column_names[of_interest[i]]+" Mean 3="+str(numpy.mean(m3))+" Mean 4="+str(numpy.mean(m4)))
 
 #Visualize which column of interest in data differ significantly in clustering
 for i in range(0,len(sigdiff)):
-    if sigdiff[i].pvalue<0.1:
+    if sigdiff[i].pvalue<0.2:
         print(comparison[i])
-
-#To input all numeric data
-of_interest2 = [4,5,6,7,14,15,17,18,19,20,21,22,23,24,25,55,57,58,59,60,61,62,63,64,65,66,79,111,112,113,114,115,117,118,125,126,127,128,129,130,131,132,133,134,136]
 
 data1,data2,data3=fix(of_interest2)
 
@@ -367,8 +377,13 @@ group2indivs=[]
 group3ans=[]
 group3indivs=[]
 temp=data[data[:,2]=='28',:]
+dow=data[data[:,2]=='0',3]
+dow0=0
+dow1=0
+dow2=0
+dow3=0
 
-#Create answers to what mood[day 28] is
+#Create answers to what mood[day 28] is, organize people by cluster, attach individual ID to location in cluster, and find average day of the week
 for row in range(0,len(Z.labels_)):
     t=temp[temp[:,9]==individuals[row],:]
     t0=0
@@ -394,23 +409,33 @@ for row in range(0,len(Z.labels_)):
             group0ans.append([t0,t1,t2])
             group0.append(data3[row])
             group0indivs.append(individuals[row])
+            dow0=dow0+int(dow[row])
     if Z.labels_[row]==1:
         if len(t) == 1:
             group1ans.append([t0,t1,t2])
             group1.append(data3[row])
             group1indivs.append(individuals[row])
+            dow1=dow1+int(dow[row])
     if Z.labels_[row]==2:
         if len(t) == 1:
             group2ans.append([t0,t1,t2])
             group2.append(data3[row])
             group2indivs.append(individuals[row])
+            dow2=dow2+int(dow[row])
     if Z.labels_[row]==3:
         if len(t) == 1:
             group3ans.append([t0,t1,t2])
             group3.append(data3[row])
             group3indivs.append(individuals[row])
+            dow3=dow3+int(dow[row])
 
-#Create neural network
+#Find average day of the week
+dow0=dow0/len(group0)
+dow1=dow1/len(group1)
+dow2=dow2/len(group2)
+dow3=dow3/len(group3)
+
+#Create neural network and iterate over 2, 3, or 4 clusters
 #Variation 1: hidden_layer_sizes=10, solver='lbfgs'
 #Variation 2: hidden_layer_sizes=(10,10), solver='lbfgs'
 #Variation 3: hidden_layer_sizes=(10,10,10), solver='lbfgs'
@@ -691,6 +716,8 @@ plt.show()
 
 
 print((mse1+mse0+mse2+mse3)/((len(group0)+len(group1)+len(group2)+len(group3))))
+
+#Copy over matrices to Excel
 install("XlsxWriter")
 if len(group0tester)>0 and len(group0testerans)>0:
     writer = pd.ExcelWriter(str(nclus)+'example'+acti+'.xlsx', engine='xlsxwriter')
@@ -713,6 +740,50 @@ if len(group3tester)>0 and len(group3testerans)>0:
     coefs1.to_excel(writer, 'Sheet4')
     writer.save()
 
+if len(group0tester)>0 and len(group0testerans)>0:
+    writer = pd.ExcelWriter(str(nclus)+'example'+acti+'2ndlayer.xlsx', engine='xlsxwriter')
+    coefs0=pd.DataFrame(data=group0model.coefs_[1])
+    coefs0.to_excel(writer, 'Sheet1')
+    writer.save()
+if len(group1tester)>0 and len(group1testerans)>0:
+    writer = pd.ExcelWriter(str(nclus)+'example2'+acti+'2ndlayer.xlsx', engine='xlsxwriter')
+    coefs1=pd.DataFrame(data=group1model.coefs_[1])
+    coefs1.to_excel(writer, 'Sheet2')
+    writer.save()
+if len(group2tester)>0 and len(group2testerans)>0:
+    writer = pd.ExcelWriter(str(nclus)+'example3'+acti+'2ndlayer.xlsx', engine='xlsxwriter')
+    coefs1=pd.DataFrame(data=group2model.coefs_[1])
+    coefs1.to_excel(writer, 'Sheet3')
+    writer.save()
+if len(group3tester)>0 and len(group3testerans)>0:  
+    writer = pd.ExcelWriter(str(nclus)+'example4'+acti+'2ndlayer.xlsx', engine='xlsxwriter')
+    coefs1=pd.DataFrame(data=group3model.coefs_[1])
+    coefs1.to_excel(writer, 'Sheet4')
+    writer.save()
+
+if len(group0tester)>0 and len(group0testerans)>0:
+    writer = pd.ExcelWriter(str(nclus)+'example'+acti+'3rdlayer.xlsx', engine='xlsxwriter')
+    coefs0=pd.DataFrame(data=group0model.coefs_[2])
+    coefs0.to_excel(writer, 'Sheet1')
+    writer.save()
+if len(group1tester)>0 and len(group1testerans)>0:
+    writer = pd.ExcelWriter(str(nclus)+'example2'+acti+'3rdlayer.xlsx', engine='xlsxwriter')
+    coefs1=pd.DataFrame(data=group1model.coefs_[2])
+    coefs1.to_excel(writer, 'Sheet2')
+    writer.save()
+if len(group2tester)>0 and len(group2testerans)>0:
+    writer = pd.ExcelWriter(str(nclus)+'example3'+acti+'3rdlayer.xlsx', engine='xlsxwriter')
+    coefs1=pd.DataFrame(data=group2model.coefs_[2])
+    coefs1.to_excel(writer, 'Sheet3')
+    writer.save()
+if len(group3tester)>0 and len(group3testerans)>0:  
+    writer = pd.ExcelWriter(str(nclus)+'example4'+acti+'3rdlayer.xlsx', engine='xlsxwriter')
+    coefs1=pd.DataFrame(data=group3model.coefs_[2])
+    coefs1.to_excel(writer, 'Sheet4')
+    writer.save()
+
+
+#Copy over variable names to Excel    
 writer = pd.ExcelWriter('ofinterestnames.xlsx', engine='xlsxwriter')
 of_interest2_names=[]
 for i in of_interest2:
@@ -724,5 +795,35 @@ writer.save()
 #Analyze 3D relationships
 #import thesis3d
 
-#Standardize
-#import stand
+#Plot correlations
+"""
+data_numeric = []
+    
+for column in [4,5,6,7,15,17,19,20,21,22,23,24,25,57,58,59,60,61,62,63,64,65,66,79,111,112,113,115,117,118,125,126,127,128,129,130,131,132,133,134,136]:
+    temp=make_num(column)
+    temp2 = pd.DataFrame({"A" : data[:,9],"B": temp})
+    temp3 = pd.pivot_table(temp2, values='B',index=['A'],aggfunc=numpy.mean)
+    temp4 = pd.pivot_table(temp2, values='B',index=['A'],aggfunc=numpy.std)
+    for i in range(0,7200):
+        person = data[i,9]
+        sd = temp4.query('A == @person')
+        mn = temp3.query('A == @person')
+        if sd.B[0] > 0:
+            temp[i]=(temp[i]-mn.B[0])/sd.B[0]
+        else:
+            temp[i]=numpy.nan
+    data_numeric.append(temp)
+
+data_numeric2 = [list(i) for i in zip(*data_numeric)]
+data_numeric3 = pd.DataFrame(data_numeric2,columns=[4,5,6,7,15,17,19,20,21,22,23,24,25,57,58,59,60,61,62,63,64,65,66,79,111,112,113,115,117,118,125,126,127,128,129,130,131,132,133,134,136])
+corrs=data_numeric3.corr()
+
+list_names=[]
+for i in [4,5,6,7,15,17,19,20,21,22,23,24,25,57,58,59,60,61,62,63,64,65,66,79,111,112,113,115,117,118,125,126,127,128,129,130,131,132,133,134,136]:
+    list_names.append(column_names[i])
+ax2 = sns.heatmap(corrs,xticklabels=list_names,yticklabels=list_names)
+plt.show()
+"""
+
+
+
