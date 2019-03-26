@@ -1,3 +1,4 @@
+#Import necessary packages
 import os
 os.chdir("/Users/marianneaguilar/Documents")
 os.getcwd()
@@ -21,7 +22,7 @@ with open("MIT-college-sleep-diary-20180919-mta.csv") as csvfile:
 column_names = data[0]
 data = numpy.delete(data, (0), axis=0)
 
-#Visualization
+#Install necessary packages
 install("matplotlib")
 import matplotlib
 install("scipy")
@@ -30,6 +31,7 @@ import matplotlib.pyplot as plt
 install("pandas")
 import pandas as pd
 
+#PART 1: DESCRIPTIVE STATISTICS
 #Visualize day-to-day plot before standardization
 individuals = numpy.unique(data[:,9])
 plt.axes()
@@ -51,11 +53,14 @@ import plotly.graph_objs as go
 install("seaborn")
 import seaborn as sns
 
+#PART 2:CLUSTERING ALL THE DATA
+
+#Define variables of interests
 #Removed 17,55,57,58,59,60,61,62,63,64,65,66,125,126,127,128,129,130,131,132,133,134
 of_interest = [4,5,6,7,14,15,18,19,20,21,22,23,24,25,79,111,112,113,114,115,117,118,136]
 
 
-#Cluster all
+#Packages to cluster data
 import scipy
 install("statistics")
 import statistics
@@ -63,15 +68,12 @@ from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from scipy.signal import periodogram,csd
 install("math")
 import math
-#N=number time series objects
-#T=length of time serie objects (using 30 days here)
-N=len(individuals)
-T=30
-P=N
+
 #Reorganize data into time series format without using pivot function
 def fix(of_interest):
     data1=[]
     data2=[]
+    #Change each data point into float and address empty points and place into data1
     for i in individuals:
         for col in of_interest:
             data_temp=data[i==data[:,9],col]
@@ -151,6 +153,7 @@ def fix(of_interest):
                         else:
                             data_temp2.append(a/c)
             data1.append(data_temp2[0:27])
+    #Standardize data and place into data2
     for row in data1:
         avg=numpy.mean(row)
         s=numpy.std(row)
@@ -160,6 +163,7 @@ def fix(of_interest):
         data2.append(data_temp3)
     data3=[]
     person=0
+    #Make each person have 27 days or filler points at the end and place into data3
     while person<238*len(of_interest):
         temp=[]
         for i in range(0,len(of_interest)):
@@ -174,6 +178,7 @@ def fix(of_interest):
         person=person+len(of_interest)
     return data1,data2,data3
 
+#Use sklearn to cluster on features of individuals
 boot=0
 install("sklearn")
 from sklearn.cluster import FeatureAgglomeration
@@ -182,6 +187,9 @@ import random
 
 of_interest2 = [4,5,6,7,14,15,17,18,19,20,21,22,23,24,25,55,57,58,59,60,61,62,63,64,65,66,79,111,112,113,114,115,117,118,125,126,127,128,129,130,131,132,133,134,136]
 
+#PART 3: CREATE NEURAL NETWORKS
+
+#Cluster students in the same way each time and take a random sample
 while boot<99:
     rand_students=random.sample(range(238),150)
     data1c,data2c,data3c=fix(of_interest)
@@ -386,6 +394,7 @@ while boot<99:
     for i in range(0,len(group3preds)):
         mse3=mse3+(group3preds[i][2]-group3fitans[i][2])**2
     print((mse1+mse0+mse2+mse3)/((len(group0)+len(group1)+len(group2)+len(group3))))
+    #For each iteration, output the weight matrix
     install("XlsxWriter")
     if len(group0tester)>0 and len(group0testerans)>0:
         writer = pd.ExcelWriter(str(nclus)+'example'+acti+'iteration'+str(boot)+'.xlsx', engine='xlsxwriter')

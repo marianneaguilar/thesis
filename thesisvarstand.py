@@ -106,6 +106,8 @@ def make_cluster(column):
     plt.title(column_names[column]+" over time per person")
     plt.show()
 
+#PART 2:CLUSTERING ALL THE DATA
+
 #Define variables of interests
 #Removed 17,55,57,58,59,60,61,62,63,64,65,66,125,126,127,128,129,130,131,132,133,134
 of_interest = [4,5,6,7,14,15,18,19,20,21,22,23,24,25,79,111,112,113,114,115,117,118,136]
@@ -363,6 +365,8 @@ for i in range(0,len(sigdiff)):
         print(comparison[i])
 
 data1,data2,data3=fix(of_interest2)
+
+#PART 3: CREATE NEURAL NETWORKS
 
 group0=[]
 group1=[]

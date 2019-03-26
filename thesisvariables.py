@@ -123,11 +123,6 @@ from scipy.signal import periodogram,csd
 install("math")
 import math
 
-#N=number time series objects
-#T=length of time serie objects (using 30 days here)
-N=len(individuals)
-T=30
-P=N
 #Function to reorganize data into time series format without using pivot function
 def fix(of_interest):
     data1=[]
@@ -381,6 +376,7 @@ of_interest2 = [4,5,6,7,14,15,17,18,19,20,21,22,23,24,25,55,57,58,59,60,61,62,63
 
 data1,data2,data3=fix(of_interest2)
 
+#PART 3: CREATE NEURAL NETWORKS
 group0=[]
 group1=[]
 group2=[]
@@ -395,7 +391,7 @@ group3ans=[]
 group3indivs=[]
 temp=data[data[:,2]=='28',:]
 
-#Create answers to what mood[day 28] is
+#Create answers to what mood[day 28] is, organize people by cluster, attach individual ID to location in cluster
 for row in range(0,len(Z.labels_)):
     t=temp[temp[:,9]==individuals[row],:]
     t0=0
@@ -437,17 +433,18 @@ for row in range(0,len(Z.labels_)):
             group3.append(data3[row])
             group3indivs.append(individuals[row])
 
-#Create neural network
+#Create neural network and iterate over 2, 3, or 4 clusters
 #Variation 1: hidden_layer_sizes=10
 #Variation 2: hidden_layer_sizes=(10,10)
 #Variation 3: hidden_layer_sizes=(10,10,10)
 #Variation 4: hidden_layer_sizes=(10,10),solver=adam,max_iter=100000
-#Variation 5:
+#Variation 5: hidden_layer_sizes=(100,100), solver='lbfgs'
+#Variation 6: hidden_layer_sizes=(5,5), solver='lbfgs'
 from sklearn.neural_network import MLPRegressor
-neural0=MLPRegressor(hidden_layer_sizes=(10,10,10),activation=acti,solver='lbfgs',random_state=0)
-neural1=MLPRegressor(hidden_layer_sizes=(10,10,10),activation=acti,solver='lbfgs',random_state=0)
-neural2=MLPRegressor(hidden_layer_sizes=(10,10,10),activation=acti,solver='lbfgs',random_state=0)
-neural3=MLPRegressor(hidden_layer_sizes=(10,10,10),activation=acti,solver='lbfgs',random_state=0)
+neural0=MLPRegressor(hidden_layer_sizes=(5,5),activation=acti,solver='lbfgs',random_state=0)
+neural1=MLPRegressor(hidden_layer_sizes=(5,5),activation=acti,solver='lbfgs',random_state=0)
+neural2=MLPRegressor(hidden_layer_sizes=(5,5),activation=acti,solver='lbfgs',random_state=0)
+neural3=MLPRegressor(hidden_layer_sizes=(5,5),activation=acti,solver='lbfgs',random_state=0)
 
 lim0=int(numpy.trunc(len(group0)/2))
 lim1=int(numpy.trunc(len(group1)/2))
@@ -710,6 +707,8 @@ for i in range(0,len(group3preds)):
 
 
 print((mse1+mse0+mse2+mse3)/(len(group0)+len(group1)+len(group2)+len(group3)))
+
+#Copy over matrices to Excel
 install("XlsxWriter")
 if len(group0tester)>0 and len(group0testerans)>0:
     writer = pd.ExcelWriter(str(nclus)+'example'+acti+'.xlsx', engine='xlsxwriter')
@@ -732,6 +731,7 @@ if len(group3tester)>0 and len(group3testerans)>0:
     coefs1.to_excel(writer, 'Sheet4')
     writer.save()
 
+#Copy over variable names to Excel 
 writer = pd.ExcelWriter('ofinterestnames.xlsx', engine='xlsxwriter')
 of_interest2_names=[]
 for i in of_interest2:
